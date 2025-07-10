@@ -2,21 +2,38 @@
 
 import { useEffect, useState } from 'react';
 import { Rnd } from 'react-rnd';
-import { useEditorStore, ElementType } from '@/store/useEditorStore';   // 👈
+import {
+    FaHeading,
+    FaRegFileAlt,
+    FaImage,
+    FaTable,
+    FaChartBar,
+} from 'react-icons/fa';
+import { useEditorStore, ElementType } from '@/store/useEditorStore';
+
+const iconMap = {
+    header: FaHeading,
+    text: FaRegFileAlt,
+    image: FaImage,
+    table: FaTable,
+    chart: FaChartBar,
+} as const;
 
 type Props = { el: ElementType; grid: [number, number] };
 
 export default function RndHydrated({ el, grid }: Props) {
-    /* ─── store ─── */
-    const update = useEditorStore((s) => s.updateElement);               // 👈
+    /* store */
+    const update = useEditorStore((s) => s.updateElement);
     const select = useEditorStore((s) => s.selectElement);
     const selectedId = useEditorStore((s) => s.selectedElementId);
 
-    /* controla si ya estamos en el cliente */
+    /* hidratación */
     const [ready, setReady] = useState(false);
     useEffect(() => setReady(true), []);
 
-    /* ---- HTML estático (SSR) ---- */
+    const Icon = iconMap[el.type];
+
+    /* ---------- bloque de HTML que se entrega en SSR ---------- */
     const staticDiv = (
         <div
             style={{
@@ -25,18 +42,21 @@ export default function RndHydrated({ el, grid }: Props) {
                 transform: `translate(${el.x}px, ${el.y}px)`,
             }}
             className={
-                'flex items-center justify-center bg-blue-600 text-white ' +
-                'font-semibold shadow select-none ' +
+                'bg-blue-600 text-white shadow select-none ' +
                 (selectedId === el.id ? 'ring-4 ring-blue-300' : '')
             }
         >
-            {el.type.toUpperCase()}
+            {/* El contenedor ocupa todo el bloque */}
+            <div className="w-full h-full flex items-center justify-center">
+                <Icon size={22} />
+            </div>
         </div>
     );
 
-    if (!ready) return staticDiv;          // enviado por el servidor
+    /* ---------- mientras aún estamos en SSR ---------- */
+    if (!ready) return staticDiv;
 
-    /* ---- versión interactiva (sólo en cliente) ---- */
+    /* ---------- versión interactiva en el cliente ---------- */
     return (
         <Rnd
             size={{ width: el.w, height: el.h }}
@@ -60,13 +80,14 @@ export default function RndHydrated({ el, grid }: Props) {
                     x: Math.round(pos.x / grid[0]) * grid[0],
                     y: Math.round(pos.y / grid[1]) * grid[1],
                 })}
+            /* mismas clases que el bloque estático */
             className={staticDiv.props.className}
-            onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                e.stopPropagation();
-                select(el.id);
-            }}
+            onClick={(e: React.MouseEvent<HTMLDivElement>) => { e.stopPropagation(); select(el.id); }}
         >
-            {staticDiv.props.children}
+            {/* contenedor 100 % para fondo azul completo */}
+            <div className="w-full h-full flex items-center justify-center">
+                <Icon size={22} />
+            </div>
         </Rnd>
     );
 }

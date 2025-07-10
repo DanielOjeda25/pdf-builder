@@ -1,19 +1,16 @@
 'use client';
 
-import {
-    useDroppable,
-    useDndMonitor,
-} from '@dnd-kit/core';
+import { useDroppable, useDndMonitor } from '@dnd-kit/core';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { v4 as uuid } from 'uuid';
 import { PALETTE_ITEM } from '@/lib/dndTypes';
 import { useEditorStore } from '@/store/useEditorStore';
-import Element from './Element';
-import RndHydrated from './RndHydrated';
+import RndHydrated from '@/components/RndHydrated'; /* ← nuevo */
+/* (quitamos Element) */
 
 const GRID_X = 24;
 const GRID_Y = 16;
-const MARGIN_PX = 75;                   // ~20 mm
+const MARGIN_PX = 75;
 
 export default function Canvas() {
     const elements = useEditorStore((s) => s.elements);
@@ -21,7 +18,6 @@ export default function Canvas() {
 
     const { setNodeRef } = useDroppable({ id: 'paper' });
 
-    /* dnd-kit sólo se usa para soltar NUEVOS bloques desde la paleta */
     useDndMonitor({
         onDragEnd: ({ active, over }) => {
             if (
@@ -43,8 +39,8 @@ export default function Canvas() {
                     data: null,
                     x: Math.round(left / GRID_X) * GRID_X,
                     y: Math.round(top / GRID_Y) * GRID_Y,
-                    w: GRID_X * 4,               // ancho inicial = 4 columnas
-                    h: GRID_Y * 2,               // alto  inicial = 2 filas
+                    w: GRID_X * 4,
+                    h: GRID_Y * 2,
                 });
             }
         },

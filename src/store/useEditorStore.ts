@@ -11,6 +11,7 @@ export type ElementType = {
     y: number;
     w: number;           // 👈  ancho
     h: number;           // 👈  alto
+    src?: string; // ⬅️  para imagen
 };
 
 type EditorState = {
