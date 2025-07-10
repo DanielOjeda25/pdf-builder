@@ -1,3 +1,6 @@
+/* ──────────────────────────────────────────────────────────
+   /src/components/Canvas.tsx  –  con borde exterior
+   ────────────────────────────────────────────────────────── */
 'use client';
 
 import {
@@ -10,58 +13,54 @@ import { PALETTE_ITEM } from '@/lib/dndTypes';
 import { useEditorStore } from '@/store/useEditorStore';
 import Element from './Element';
 
+const GRID_X = 24;
+const GRID_Y = 16;
+const MARGIN_PX = 75;          // margen de 20 mm aprox. en 96 dpi
+
 export default function Canvas() {
     const elements = useEditorStore((s) => s.elements);
-    const addElement = useEditorStore((s) => s.addElement);
+    const addElem = useEditorStore((s) => s.addElement);
     const updateElem = useEditorStore((s) => s.updateElement);
 
-    /* zona droppable */
     const { setNodeRef } = useDroppable({ id: 'paper' });
 
-    /* monitor de drag */
+    /* manejo de drag */
     useDndMonitor({
         onDragEnd: ({ active, delta, over }) => {
             if (!over) return;
 
-            /* nuevo — desde paleta */
+            const bodyLeft = over.rect.left + MARGIN_PX;
+            const bodyTop = over.rect.top + MARGIN_PX;
+
+            /* nuevo desde paleta */
             if (
                 active.data.current?.kind === PALETTE_ITEM &&
                 over.id === 'paper'
             ) {
-                const paperRect = over.rect;
-                const act = active.rect.current as any; // acceso a .translated
-                const left = act.translated?.left ?? act.left;
-                const top = act.translated?.top ?? act.top;
+                const act = active.rect.current as any;
+                const left = (act.translated?.left ?? act.left) - bodyLeft;
+                const top = (act.translated?.top ?? act.top) - bodyTop;
 
-                const gridX = 24;
-                const gridY = 16;
-
-                const newX = Math.round((left - paperRect.left) / gridX) * gridX;
-                const newY = Math.round((top - paperRect.top) / gridY) * gridY;
-
-                addElement({
+                addElem({
                     id: uuid(),
                     type: active.data.current.type,
                     content: active.data.current.type,
                     style: {},
                     data: null,
-                    x: newX,
-                    y: newY,
+                    x: Math.round(left / GRID_X) * GRID_X,
+                    y: Math.round(top / GRID_Y) * GRID_Y,
                 });
                 return;
             }
 
             /* mover existente */
             if (active.data.current?.kind === 'ELEMENT') {
-                const gridX = 24;
-                const gridY = 16;
-
                 const rawX = active.data.current.x + delta.x;
                 const rawY = active.data.current.y + delta.y;
 
                 updateElem(active.id as string, {
-                    x: Math.round(rawX / gridX) * gridX,
-                    y: Math.round(rawY / gridY) * gridY,
+                    x: Math.round(rawX / GRID_X) * GRID_X,
+                    y: Math.round(rawY / GRID_Y) * GRID_Y,
                 });
             }
         },
@@ -69,18 +68,26 @@ export default function Canvas() {
 
     return (
         <LayoutGroup>
+            {/* hoja completa con padding = márgenes */}
             <motion.div
                 ref={setNodeRef}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="relative w-[210mm] min-h-[297mm] bg-white shadow-lg paper-grid"
+                className="relative w-[210mm] min-h-[297mm] bg-white shadow-lg"
+                style={{ padding: `${MARGIN_PX}px` }}
             >
-                <AnimatePresence>
-                    {elements.map((el) => (
-                        <Element key={el.id} element={el} />
-                    ))}
-                </AnimatePresence>
+                {/* cuerpo del documento: cuadrícula + borde */}
+                <div
+                    className="relative w-full h-full paper-grid border border-gray-200"
+                    style={{ backgroundSize: `${GRID_X}px ${GRID_Y}px` }}
+                >
+                    <AnimatePresence>
+                        {elements.map((el) => (
+                            <Element key={el.id} element={el} />
+                        ))}
+                    </AnimatePresence>
+                </div>
             </motion.div>
         </LayoutGroup>
     );
