@@ -1,55 +1,43 @@
-/* ────────────────────────────────────────────────────────────────
-   /src/components/Canvas.tsx
-   Hoja A4 droppable + movimiento libre alineado a rejilla
-   (versión que compila en TypeScript)
-   ──────────────────────────────────────────────────────────────── */
 'use client';
 
 import {
-    useDndMonitor,
     useDroppable,
+    useDndMonitor,
 } from '@dnd-kit/core';
-import { PALETTE_ITEM } from '@/lib/dndTypes';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { v4 as uuid } from 'uuid';
+import { PALETTE_ITEM } from '@/lib/dndTypes';
 import { useEditorStore } from '@/store/useEditorStore';
 import Element from './Element';
 
 export default function Canvas() {
-    /* ---------------- estado global ---------------- */
     const elements = useEditorStore((s) => s.elements);
     const addElement = useEditorStore((s) => s.addElement);
     const updateElem = useEditorStore((s) => s.updateElement);
 
-    /* -------------- zona droppable (la “hoja”) -------------- */
+    /* zona droppable */
     const { setNodeRef } = useDroppable({ id: 'paper' });
 
-    /* -------------- monitor de drag -------------- */
+    /* monitor de drag */
     useDndMonitor({
         onDragEnd: ({ active, delta, over }) => {
             if (!over) return;
 
-            /* Caso 1 ▸ soltamos algo de la paleta dentro del papel */
+            /* nuevo — desde paleta */
             if (
                 active.data.current?.kind === PALETTE_ITEM &&
                 over.id === 'paper'
             ) {
-                /* Rect del papel */
                 const paperRect = over.rect;
+                const act = active.rect.current as any; // acceso a .translated
+                const left = act.translated?.left ?? act.left;
+                const top = act.translated?.top ?? act.top;
 
-                /* Rect del ítem mientras se arrastraba
-                   ⚠️ typamos como any para acceder a .translated */
-                const activeRect = active.rect.current as any;
+                const gridX = 24;
+                const gridY = 16;
 
-                const translatedLeft = activeRect.translated
-                    ? activeRect.translated.left
-                    : activeRect.left;
-                const translatedTop = activeRect.translated
-                    ? activeRect.translated.top
-                    : activeRect.top;
-
-                const newX = Math.round((translatedLeft - paperRect.left) / 24) * 24;
-                const newY = Math.round((translatedTop - paperRect.top) / 16) * 16;
-
+                const newX = Math.round((left - paperRect.left) / gridX) * gridX;
+                const newY = Math.round((top - paperRect.top) / gridY) * gridY;
 
                 addElement({
                     id: uuid(),
@@ -63,25 +51,37 @@ export default function Canvas() {
                 return;
             }
 
-            /* Caso 2 ▸ movemos un bloque EXISTENTE dentro del papel */
+            /* mover existente */
             if (active.data.current?.kind === 'ELEMENT') {
+                const gridX = 24;
+                const gridY = 16;
+
+                const rawX = active.data.current.x + delta.x;
+                const rawY = active.data.current.y + delta.y;
+
                 updateElem(active.id as string, {
-                    x: active.data.current.x + delta.x,
-                    y: active.data.current.y + delta.y,
+                    x: Math.round(rawX / gridX) * gridX,
+                    y: Math.round(rawY / gridY) * gridY,
                 });
             }
         },
     });
 
-    /* ---------------- Render ---------------- */
     return (
-        <div
-            ref={setNodeRef}
-            className="relative w-[210mm] min-h-[297mm] bg-white shadow-lg paper-grid"
-        >
-            {elements.map((el) => (
-                <Element key={el.id} element={el} />
-            ))}
-        </div>
+        <LayoutGroup>
+            <motion.div
+                ref={setNodeRef}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="relative w-[210mm] min-h-[297mm] bg-white shadow-lg paper-grid"
+            >
+                <AnimatePresence>
+                    {elements.map((el) => (
+                        <Element key={el.id} element={el} />
+                    ))}
+                </AnimatePresence>
+            </motion.div>
+        </LayoutGroup>
     );
 }

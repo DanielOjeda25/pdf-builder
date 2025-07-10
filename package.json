@@ -17,6 +17,7 @@
     "@types/uuid": "^10.0.0",
     "chartjs-node-canvas": "^5.0.0",
     "dnd-kit": "^0.0.2",
+    "framer-motion": "^12.23.3",
     "next": "15.3.5",
     "node-fetch": "^3.3.2",
     "pdf-lib": "^1.17.1",

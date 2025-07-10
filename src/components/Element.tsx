@@ -1,48 +1,50 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { useDraggable } from '@dnd-kit/core';
 import { ElementType, useEditorStore } from '@/store/useEditorStore';
 
 export default function Element({ element }: { element: ElementType }) {
     const select = useEditorStore((s) => s.selectElement);
+    const selectedId = useEditorStore((s) => s.selectedElementId);
 
-    /* draggable: enviamos también el type para mostrarlo en el overlay */
-    const { attributes, listeners, setNodeRef, transform, isDragging } =
+    const { setNodeRef, attributes, listeners, transform, isDragging } =
         useDraggable({
             id: element.id,
-            data: {
-                kind: 'ELEMENT',
-                type: element.type,
-                x: element.x,
-                y: element.y,
-            },
+            data: { kind: 'ELEMENT', type: element.type, x: element.x, y: element.y },
         });
 
-    const style: React.CSSProperties = {
-        top: element.y,
-        left: element.x,
-        position: 'absolute',
-        transform: transform
-            ? `translate(${transform.x}px, ${transform.y}px)`
-            : undefined,
-        opacity: isDragging ? 0.5 : 1,
-        userSelect: 'none',
-    };
-
     return (
-        <div
+        <motion.div
             ref={setNodeRef}
             {...attributes}
             {...listeners}
-            onClick={(e) => {
-                e.stopPropagation();
-                select(element.id);
+            onClick={(e) => { e.stopPropagation(); select(element.id); }}
+            /* posición */
+            style={{
+                top: element.y,
+                left: element.x,
+                position: 'absolute',
+                transform: transform
+                    ? `translate(${transform.x}px, ${transform.y}px)`
+                    : undefined,
+                opacity: isDragging ? 0.55 : 1,
+                userSelect: 'none',
             }}
-            style={style}
-            className="border rounded-md bg-blue-600 text-white px-4 py-2 shadow-sm
-                 cursor-move hover:shadow-md select-none"
+            /* animaciones */
+            layout
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+            /* clases Tailwind — SIN rounded, SIN border */
+            className={
+                'px-5 py-2 min-w-[96px] text-center font-semibold text-white ' +
+                'bg-blue-600 shadow-md cursor-move select-none ' +
+                (selectedId === element.id ? 'ring-4 ring-blue-300' : '')
+            }
+            exit={{ opacity: 0, scale: 0.7 }}
         >
-            {element.type.toUpperCase()}
-        </div>
+            {(element.type ?? '').toUpperCase()}
+        </motion.div>
     );
 }

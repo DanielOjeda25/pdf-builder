@@ -12,12 +12,12 @@ export default function PropertiesPanel() {
 
     return (
         <aside className="w-80 border-l bg-white px-5 py-6 overflow-y-auto">
-            <h3 className="font-semibold mb-2">Propiedades</h3>
+            <h3 className="font-semibold mb-2 text-gray-600">Propiedades</h3>
 
             {/* Texto / Header */}
             {(element.type === 'text' || element.type === 'header') && (
                 <>
-                    <label className="block text-sm">Contenido</label>
+                    <label className="block text-sm text-gray-600">Contenido</label>
                     <textarea
                         className="w-full border p-1 mb-3"
                         value={element.content}
@@ -25,7 +25,7 @@ export default function PropertiesPanel() {
                             update(element.id, { content: e.target.value })
                         }
                     />
-                    <label className="block text-sm">Color</label>
+                    <label className="block text-sm text-gray-600">Color</label>
                     <input
                         type="color"
                         className="mb-3"
@@ -40,7 +40,7 @@ export default function PropertiesPanel() {
             {/* Imagen */}
             {element.type === 'image' && (
                 <>
-                    <label className="block text-sm">URL de imagen</label>
+                    <label className="block text-sm text-gray-600">URL de imagen</label>
                     <input
                         className="w-full border p-1 mb-3"
                         value={element.content}
