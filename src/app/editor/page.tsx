@@ -63,7 +63,6 @@ export default function EditorPage() {
 
             {/* ───────────── DragOverlay ───────────── */}
             <DragOverlay dropAnimation={null}>
-                {/* Botón de la paleta → preview azul pequeño */}
                 {activeData?.kind === PALETTE_ITEM && (
                     <div className="px-4 py-2 rounded bg-blue-600 text-white text-sm shadow select-none">
                         {activeData.type.toUpperCase()}
