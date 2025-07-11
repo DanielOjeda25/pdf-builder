@@ -19,8 +19,8 @@ function FileInput({
                 if (f && f.size <= 1_048_576) onFile(f);
             }}
             className="file:px-3 file:py-1 file:rounded-md file:border-0
-                 file:bg-blue-600 file:text-white
-                 hover:file:bg-blue-700 cursor-pointer text-xs"
+                 file:bg-pdf-500 file:text-white
+                 hover:file:bg-pdf-700 cursor-pointer text-xs"
             id={`file-${id}`}
             name={`file-${id}`}
         />
@@ -55,9 +55,7 @@ export default function PropertiesPanel() {
                         onChange={(e) =>
                             update(element.id, { content: e.target.value })
                         }
-                        className="w-full rounded-md border border-gray-300
-                       px-3 py-2 text-sm bg-gray-50 focus:bg-white
-                       focus:ring-2 focus:ring-blue-400"
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pdf-300"
                     />
                 </div>
             )}

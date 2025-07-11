@@ -37,23 +37,17 @@ export default function PaletteItem({ type }: Props) {
             {...listeners}
             type="button"
             title={type.toUpperCase()}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            transition={{ duration: 0.2 }}
-            className="
-        w-10 h-10
-        bg-blue-600 text-white
-        rounded-full
-        flex items-center justify-center
-        shadow-sm
-        hover:shadow-lg
-        focus:outline-none focus:ring-2 focus:ring-blue-400
-        transition
-        duration-200
-        cursor-grab active:cursor-grabbing
-      "
+            whileHover={{
+                scale: 1,
+                backgroundColor: '#fff',
+                color: 'var(--color-pdf-500, #E82F2F)',
+            }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.05 }}
+            className="w-full h-20 bg-pdf-500 text-white rounded-lg flex items-center justify-center shadow-sm hover:bg-white hover:text-pdf-500 focus:outline-none focus:ring-2 focus:ring-pdf-300 transition duration-200 cursor-grab active:cursor-grabbing"
+            style={{ aspectRatio: '1 / 1', minHeight: '3.5rem', minWidth: '3.5rem' }}
         >
-            <Icon className="w-5 h-5" />
+            <Icon className="w-8 h-8" />
         </motion.button>
     );
 }

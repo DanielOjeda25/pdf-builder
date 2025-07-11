@@ -65,8 +65,8 @@ export default function RndHydrated({ el, grid }: Props) {
 
     /* ---------- clases ---------- */
     const base =
-        `bg-blue-600 text-white rounded-md shadow-sm hover:shadow-lg
-     transition cursor-move select-none ${selectedId === el.id ? 'ring-4 ring-blue-300' : ''
+        `bg-pdf-500 text-white rounded-md shadow-sm hover:shadow-lg
+     transition cursor-move select-none ${selectedId === el.id ? 'ring-4 ring-pdf-300' : ''
         }`;
 
     const contentCls =

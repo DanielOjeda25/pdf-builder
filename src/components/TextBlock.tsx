@@ -9,7 +9,7 @@ export default function TextBlock({
     return (
         <div
             className={
-                'w-full h-full flex items-center justify-center overflow-hidden ' +
+                'w-full h-full flex items-center justify-center overflow-hidden font-sans ' +
                 (asHeader ? 'text-lg font-bold' : 'text-sm')
             }
         >

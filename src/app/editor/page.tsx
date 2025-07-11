@@ -64,13 +64,13 @@ export default function EditorPage() {
                     initial={{ x: -80, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.45 }}
-                    className="w-80 shrink-0 border-r bg-white flex flex-col"
+                    className="flex w-80 shrink-0 flex-col border-r bg-white"
                 >
-                    <div className="p-4 overflow-y-auto">
+                    <div className="overflow-y-auto p-4">
                         <Palette />
                     </div>
-                    <div className="bg-gray-50 border-t p-4 overflow-y-auto">
-                        <h3 className="text-sm font-semibold text-gray-600 mb-3">
+                    <div className="overflow-y-auto border-t bg-gray-50 p-4">
+                        <h3 className="mb-3 text-sm font-semibold text-gray-600">
                             Propiedades
                         </h3>
                         <PropertiesPanel />
@@ -97,8 +97,7 @@ export default function EditorPage() {
                     return (
                         <div
                             style={{ width: defaultW, height: defaultH }}
-                            className="flex items-center justify-center bg-blue-600 text-white
-                   font-semibold shadow select-none rounded"
+                            className="flex select-none items-center justify-center rounded bg-pdf-500 font-semibold text-white shadow"
                         >
                             <Icon size={24} />
                         </div>
@@ -116,8 +115,7 @@ export default function EditorPage() {
                     return (
                         <div
                             style={{ width: w, height: h }}
-                            className="flex items-center justify-center bg-blue-600 text-white
-                   font-semibold shadow select-none rounded"
+                            className="flex select-none items-center justify-center rounded bg-pdf-500 font-semibold text-white shadow"
                         >
                             <Icon size={24} />
                         </div>

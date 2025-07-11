@@ -14,7 +14,7 @@ export default function Home() {
 
       <Link
         href="/editor"
-        className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700 transition"
+        className="rounded-lg bg-pdf-500 px-6 py-3 font-medium text-white hover:bg-pdf-700 transition"
       >
         Ir al editor →
       </Link>

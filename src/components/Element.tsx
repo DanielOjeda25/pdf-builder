@@ -42,9 +42,9 @@ export default function Element({ element, grid }: Props) {
             onDrag={onDrag}
             onResize={onResize}
             className={
-                'flex items-center justify-center bg-blue-600 text-white ' +
+                'flex items-center justify-center bg-pdf-500 text-white ' +
                 'font-semibold shadow cursor-move select-none ' +
-                (selectedId === element.id ? 'ring-4 ring-blue-300' : '')
+                (selectedId === element.id ? 'ring-4 ring-pdf-300' : '')
             }
             onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                 e.stopPropagation();
