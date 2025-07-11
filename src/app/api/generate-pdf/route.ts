@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import type { ElementType } from '@/types/editor';
 
 export async function POST(req: NextRequest) {
     const { elements } = await req.json();
 
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage();
-    const { width, height } = page.getSize();
+    const { height } = page.getSize();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     let y = height - 40;          // margen superior
 
-    elements.forEach((el: any) => {
+    elements.forEach((el: ElementType) => {
         switch (el.type) {
             case 'header':
                 page.drawText(el.content || '', {

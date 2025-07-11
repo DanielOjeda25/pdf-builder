@@ -40,7 +40,7 @@ type Kind = keyof typeof iconMap;
 const restrictIfElement: Modifier = (args) => {
     const { active } = args;
     if (!active) return args.transform;
-    return (active.data.current as any)?.kind === 'ELEMENT'
+    return (active.data.current as { kind?: string })?.kind === 'ELEMENT'
         ? restrictToParentElement(args)
         : args.transform;
 };
@@ -49,14 +49,14 @@ export default function EditorPage() {
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
     );
-    const [activeData, setActiveData] = useState<any>(null);
+    const [activeData, setActiveData] = useState<Record<string, unknown> | null>(null);
 
     return (
         <DndContext
             id="palette"
             sensors={sensors}
             modifiers={[restrictIfElement, snapToGrid(24, 16)]}
-            onDragStart={(evt) => setActiveData(evt.active.data.current)}
+            onDragStart={(evt) => setActiveData(evt.active.data.current as Record<string, unknown>)}
             onDragEnd={() => setActiveData(null)}
         >
             <div className="flex h-screen overflow-hidden">

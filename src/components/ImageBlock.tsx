@@ -12,6 +12,9 @@ interface Props {
     src: string | null | undefined;
 }
 
+// Loader para blobs/data URLs
+const customLoader = ({ src }: { src: string }) => src;
+
 export default function ImageBlock({ id, src }: Props) {
     const update = useEditorStore((s) => s.updateElement);
 
@@ -72,11 +75,15 @@ export default function ImageBlock({ id, src }: Props) {
                         draggable={false}
                     />
                 ) : (
-                    <img
-                        src={src}
+                    <Image
+                        src={src as string}
                         alt="preview"
+                        width={400}
+                        height={300}
                         className="max-w-full max-h-full object-contain pointer-events-none"
                         draggable={false}
+                        loader={customLoader}
+                        unoptimized
                     />
                 )
             ) : (
