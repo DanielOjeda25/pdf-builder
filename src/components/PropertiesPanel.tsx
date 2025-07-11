@@ -4,53 +4,37 @@ import { useEditorStore } from '@/store/useEditorStore';
 export default function PropertiesPanel() {
     const selectedId = useEditorStore((s) => s.selectedElementId);
     const element = useEditorStore((s) =>
-        s.elements.find((e) => e.id === selectedId)
+        s.elements.find((el) => el.id === selectedId)
     );
     const update = useEditorStore((s) => s.updateElement);
 
-    if (!element) return null;
+    if (!element) return <p className="text-sm text-gray-400">Seleccione un bloque</p>;
 
     return (
-        <aside className="w-80 border-l bg-white px-5 py-6 overflow-y-auto">
-            <h3 className="font-semibold mb-2 text-gray-600">Propiedades</h3>
-
-            {/* Texto / Header */}
-            {(element.type === 'text' || element.type === 'header') && (
+        <div className="space-y-4">
+            {element.type === 'text' || element.type === 'header' ? (
                 <>
-                    <label className="block text-sm text-gray-600">Contenido</label>
+                    <label className="block text-xs text-gray-600 mb-1">Contenido</label>
                     <textarea
-                        className="w-full border p-1 mb-3"
-                        value={element.content}
-                        onChange={(e) =>
-                            update(element.id, { content: e.target.value })
-                        }
-                    />
-                    <label className="block text-sm text-gray-600">Color</label>
-                    <input
-                        type="color"
-                        className="mb-3"
-                        value={element.style?.color || '#000000'}
-                        onChange={(e) =>
-                            update(element.id, { style: { ...element.style, color: e.target.value } })
-                        }
+                        value={element.content ?? ''}
+                        onChange={(e) => update(element.id, { content: e.target.value })}
+                        className="w-full h-24 border rounded p-1 text-sm"
                     />
                 </>
-            )}
+            ) : null}
 
-            {/* Imagen */}
-            {element.type === 'image' && (
+            {element.type === 'image' ? (
                 <>
-                    <label className="block text-sm text-gray-600">URL de imagen</label>
+                    <label className="block text-xs text-gray-600 mb-1">URL de imagen</label>
                     <input
-                        className="w-full border p-1 mb-3"
-                        value={element.content}
-                        onChange={(e) =>
-                            update(element.id, { content: e.target.value })
-                        }
+                        type="text"
+                        value={element.src ?? ''}
+                        onChange={(e) => update(element.id, { src: e.target.value })}
+                        className="w-full border rounded p-1 text-sm"
+                        placeholder="https://…"
                     />
                 </>
-            )}
-            {/* …añadir aquí tabla / gráfico más adelante … */}
-        </aside>
+            ) : null}
+        </div>
     );
 }

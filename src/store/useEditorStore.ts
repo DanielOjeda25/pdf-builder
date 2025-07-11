@@ -1,17 +1,14 @@
-/* estado global – versión completa */
 import { create } from 'zustand';
 
 export type ElementType = {
     id: string;
     type: 'header' | 'text' | 'image' | 'table' | 'chart';
-    content?: string;
-    style?: Record<string, string>;
-    data?: any;
     x: number;
     y: number;
-    w: number;           // 👈  ancho
-    h: number;           // 👈  alto
-    src?: string; // ⬅️  para imagen
+    w: number;
+    h: number;
+    content?: string; // texto / encabezado
+    src?: string;     // dataURL o URL remota de imagen
 };
 
 type EditorState = {
