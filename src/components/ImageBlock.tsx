@@ -1,50 +1,81 @@
 'use client';
-import { useRef, useState } from 'react';
+
+import { useCallback } from 'react';
+import { useDropzone, FileRejection } from 'react-dropzone';
 import { useEditorStore } from '@/store/useEditorStore';
 
-export default function ImageBlock({ id, src }: { id: string; src?: string }) {
+const MAX_SIZE = 1_048_576; // 1 MB
+
+interface Props {
+    id: string;
+    src: string | null | undefined;
+}
+
+export default function ImageBlock({ id, src }: Props) {
     const update = useEditorStore((s) => s.updateElement);
-    const fileRef = useRef<HTMLInputElement>(null);
-    const [disabled, setDisabled] = useState(true);   // ← desactivado por defecto
 
-    const openDialog = () => {
-        /* habilitamos eventos SOLO para este click */
-        setDisabled(false);
-        // brief timeout: el click pasa → después volvemos a desactivar
-        setTimeout(() => fileRef.current?.click(), 0);
-    };
+    /* ——— callback de carga ——— */
+    const onDrop = useCallback(
+        (accepted: File[], rejected: FileRejection[]) => {
+            if (accepted[0]) {
+                const url = URL.createObjectURL(accepted[0]);
+                update(id, { src: url });
+            }
+        },
+        [id, update],
+    );
 
-    const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        setDisabled(true);                               // ← volver a bloquear
-        if (!file) return;
-        if (file.size > 1024 * 1024) {
-            alert('La imagen no puede superar 1 MB');
-            e.target.value = '';
-            return;
-        }
-        update(id, { src: URL.createObjectURL(file) });
-    };
+    /* ——— configuración de dropzone ——— */
+    const {
+        getRootProps,
+        getInputProps,
+        isDragActive,
+        fileRejections,
+    } = useDropzone({
+        accept: { 'image/*': [] },
+        maxSize: MAX_SIZE,
+        multiple: false,
+        onDrop,
+    });
 
+    const tooLarge =
+        fileRejections.length > 0 &&
+        fileRejections[0].errors.some((e) => e.code === 'file-too-large');
+
+    /* ——— UI ——— */
     return (
         <div
-            className="w-full h-full flex items-center justify-center relative overflow-hidden cursor-pointer"
-            onDoubleClick={openDialog}                     /* doble clic para subir   */
+            {...getRootProps()}
+            className={`w-full h-full flex items-center justify-center rounded-md
+                  transition-colors text-center px-2
+                  ${isDragActive ? 'bg-blue-500/20' : ''}
+                  ${tooLarge ? 'bg-red-500/20' : ''}`}
         >
-            {src ? (
-                <img src={src} alt="" className="max-w-full max-h-full object-contain" />
-            ) : (
-                <span className="text-xs select-none">Doble-clic para subir</span>
-            )}
-
+            {/* aquí pasamos los atributos extra al input */}
             <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                onChange={handleSelect}
-                className="no-drag absolute inset-0 opacity-0"
-                style={{ pointerEvents: disabled ? 'none' : 'auto' }}
+                {...getInputProps({
+                    capture: 'environment',          // cámara trasera en móviles
+                    name: `upload-${id}`,
+                    id: `upload-${id}`,
+                })}
             />
+
+            {src ? (
+                <img
+                    src={src}
+                    alt="preview"
+                    className="max-w-full max-h-full object-contain pointer-events-none"
+                    draggable={false}
+                />
+            ) : (
+                <span className="text-xs text-white whitespace-pre-line select-none">
+                    {tooLarge
+                        ? 'Imagen > 1 MB'
+                        : isDragActive
+                            ? 'Suelta para subir'
+                            : 'Toca o arrastra\naquí para subir'}
+                </span>
+            )}
         </div>
     );
 }

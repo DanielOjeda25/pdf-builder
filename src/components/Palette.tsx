@@ -1,16 +1,21 @@
 'use client';
 
 import PaletteItem from './PaletteItem';
+import type { BlockKind } from '@/types/editor';
+
+const items: BlockKind[] = ['header', 'text', 'image', 'table', 'chart'];
 
 export default function Palette() {
-    // Tipos disponibles en la barra
-    const items = ['header', 'text', 'image', 'table', 'chart'] as const;
-
     return (
-        <nav>
-            {items.map((t) => (
-                <PaletteItem key={t} type={t} />
+        <div
+            className="
+        grid grid-cols-2 gap-3        /* ← 2 columnas, se adaptan */
+        justify-items-center
+      "
+        >
+            {items.map((type) => (
+                <PaletteItem key={type} type={type} />
             ))}
-        </nav>
+        </div>
     );
 }

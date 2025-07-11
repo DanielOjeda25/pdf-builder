@@ -1,63 +1,91 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { ElementType, useEffect, useState } from 'react';
 import { Rnd } from 'react-rnd';
 import {
-    FaHeading, FaRegFileAlt, FaImage, FaTable, FaChartBar,
+    FaHeading,
+    FaRegFileAlt,
+    FaImage,
+    FaTable,
+    FaChartBar,
 } from 'react-icons/fa';
-import { useEditorStore, ElementType } from '@/store/useEditorStore';
+import { useEditorStore } from '@/store/useEditorStore';
 import TextBlock from './TextBlock';
 import ImageBlock from './ImageBlock';
+import { BlockKind } from '@/types/editor';
 
-const icons = {
+const Icons: Record<BlockKind, React.ElementType> = {
     header: FaHeading,
     text: FaRegFileAlt,
     image: FaImage,
     table: FaTable,
     chart: FaChartBar,
-} as const;
+};
 
-type Props = { el: ElementType; grid: [number, number] };
+interface Props {
+    el: ElementType;
+    grid: [number, number];
+}
 
 export default function RndHydrated({ el, grid }: Props) {
+    /* ───────── estado global ───────── */
     const update = useEditorStore((s) => s.updateElement);
     const select = useEditorStore((s) => s.selectElement);
     const selectedId = useEditorStore((s) => s.selectedElementId);
 
+    /* hidratación SSR */
     const [hydrated, setHydrated] = useState(false);
     useEffect(() => setHydrated(true), []);
 
-    /* -------- contenido interno ---------- */
+    /* --------- contenido según tipo --------- */
     const Inner = () => {
-        if (el.type === 'text')
-            return <TextBlock content={el.content} />;
-        if (el.type === 'header')
-            return <TextBlock content={el.content} asHeader />;
-        if (el.type === 'image')
-            return <ImageBlock id={el.id} src={el.src} />;
-        const Icon = icons[el.type];
-        return <Icon size={22} />;
+        switch (el.type) {
+            case 'header':
+                return <TextBlock content={el.content} asHeader />;
+            case 'text':
+                return <TextBlock content={el.content} />;
+            case 'image':
+                return <ImageBlock id={el.id} src={el.src} />;
+            default: {
+                const Ico = Icons[el.type];
+                return <Ico className="w-6 h-6" />;
+            }
+        }
     };
 
-    const baseCls =
-        'cursor-move bg-blue-600 text-white shadow select-none flex items-center ' +
-        'justify-center overflow-hidden ' +
-        (selectedId === el.id ? 'ring-4 ring-blue-300' : '');
+    /* --------- clases base --------- */
+    const baseCls = `
+    bg-blue-600 text-white rounded-md shadow-sm hover:shadow-lg transition
+    cursor-move select-none
+    ${selectedId === el.id ? 'ring-4 ring-blue-300' : ''}
+  `;
 
+    /* wrapper para contenido:
+       - image necesita pointer-events para el doble-clic,
+       - los demás pueden vivir con none (no afecta al drag)           */
+    const contentCls =
+        el.type === 'image'
+            ? 'w-full h-full flex items-center justify-center'
+            : 'w-full h-full flex items-center justify-center pointer-events-none';
+
+    /* --------- versión SSR estática --------- */
     const staticDiv = (
         <div
             style={{
-                width: el.w, height: el.h,
-                transform: `translate(${el.x}px, ${el.y}px)`
+                width: el.w,
+                height: el.h,
+                transform: `translate(${el.x}px, ${el.y}px)`,
             }}
             className={baseCls}
         >
-            <Inner />
+            <div className={contentCls}>
+                <Inner />
+            </div>
         </div>
     );
-
     if (!hydrated) return staticDiv;
 
+    /* --------- versión interactiva --------- */
     return (
         <Rnd
             size={{ width: el.w, height: el.h }}
@@ -67,7 +95,6 @@ export default function RndHydrated({ el, grid }: Props) {
             resizeGrid={grid}
             minWidth={grid[0] * 2}
             minHeight={grid[1] * 2}
-            cancel=".no-drag"
             onDragStop={(_, d) =>
                 update(el.id, {
                     x: Math.round(d.x / grid[0]) * grid[0],
@@ -81,9 +108,16 @@ export default function RndHydrated({ el, grid }: Props) {
                     y: Math.round(pos.y / grid[1]) * grid[1],
                 })}
             className={baseCls}
-            onClick={(e: React.MouseEvent) => { e.stopPropagation(); select(el.id); }}
+            onClick={(
+                e: React.MouseEvent<HTMLDivElement>   // 👈 añade el tipo concreto
+            ) => {
+                e.stopPropagation();
+                select(el.id);
+            }}
         >
-            <Inner />
+            <div className={contentCls}>
+                <Inner />
+            </div>
         </Rnd>
     );
 }

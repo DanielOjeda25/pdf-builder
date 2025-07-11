@@ -53,6 +53,7 @@ export default function EditorPage() {
 
     return (
         <DndContext
+            id="palette"
             sensors={sensors}
             modifiers={[restrictIfElement, snapToGrid(24, 16)]}
             onDragStart={(evt) => setActiveData(evt.active.data.current)}
