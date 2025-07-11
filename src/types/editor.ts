@@ -9,4 +9,8 @@ export interface ElementType {
     h: number;
     content?: string;
     src?: string | null;
+    bold?: boolean;
+    italic?: boolean;
+    fontSize?: number;
+    align?: 'left' | 'center' | 'right' | 'justify';
 }

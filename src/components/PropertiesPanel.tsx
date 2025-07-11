@@ -1,5 +1,6 @@
 'use client';
 import { useEditorStore } from '@/store/useEditorStore';
+import { useState } from 'react';
 
 /* ---------- helpers ---------- */
 function FileInput({
@@ -29,10 +30,21 @@ function FileInput({
 /* ---------- panel principal ---------- */
 export default function PropertiesPanel() {
     const id = useEditorStore((s) => s.selectedElementId);
-    const element = useEditorStore((s) =>
-        s.elements.find((el) => el.id === id)
-    );
+    const element = useEditorStore((s) => s.elements.find((el) => el.id === id)) as import("@/types/editor").ElementType | undefined;
     const update = useEditorStore((s) => s.updateElement);
+
+    // Opciones de formato (hooks siempre al inicio)
+    const isText = element && (element.type === 'header' || element.type === 'text');
+    const [localContent, setLocalContent] = useState(element?.content ?? '');
+    const [bold, setBold] = useState(element?.bold ?? false);
+    const [italic, setItalic] = useState(element?.italic ?? false);
+    const [fontSize, setFontSize] = useState(element?.fontSize ?? 16);
+    const [align, setAlign] = useState(element?.align ?? 'left');
+
+    const handleFormatChange = <K extends keyof import("@/types/editor").ElementType>(prop: K, value: import("@/types/editor").ElementType[K]) => {
+        if (!element) return;
+        update(element.id, { [prop]: value });
+    };
 
     /* contenedor exterior YA EXISTE en tu sidebar, así que
        devolvemos solo el contenido interno  */
@@ -42,7 +54,7 @@ export default function PropertiesPanel() {
     return (
         <div className="bg-white shadow rounded-lg p-4 space-y-4">
             {/* header & text */}
-            {(element.type === 'header' || element.type === 'text') && (
+            {isText && (
                 <div className="space-y-2">
                     <label className="text-xs text-gray-600 font-medium" htmlFor="txt">
                         Contenido
@@ -50,12 +62,53 @@ export default function PropertiesPanel() {
                     <textarea
                         id="txt"
                         rows={4}
-                        value={element.content ?? ''}
-                        onChange={(e) =>
-                            update(element.id, { content: e.target.value })
-                        }
+                        value={localContent}
+                        onChange={(e) => {
+                            setLocalContent(e.target.value);
+                            update(element.id, { content: e.target.value });
+                        }}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-pdf-300"
                     />
+                    {/* Controles de formato */}
+                    <div className="flex items-center gap-2 mt-2">
+                        <button
+                            type="button"
+                            className={`px-2 py-1 rounded ${bold ? 'bg-pdf-500 text-white' : 'bg-gray-100 text-gray-700'}`}
+                            onClick={() => { setBold(!bold); handleFormatChange('bold', !bold); }}
+                        >
+                            <b>B</b>
+                        </button>
+                        <button
+                            type="button"
+                            className={`px-2 py-1 rounded ${italic ? 'bg-pdf-500 text-white' : 'bg-gray-100 text-gray-700'}`}
+                            onClick={() => { setItalic(!italic); handleFormatChange('italic', !italic); }}
+                        >
+                            <i>I</i>
+                        </button>
+                        <select
+                            className="px-2 py-1 rounded border border-gray-300 bg-gray-50 text-sm"
+                            value={fontSize}
+                            onChange={e => { setFontSize(Number(e.target.value)); handleFormatChange('fontSize', Number(e.target.value)); }}
+                        >
+                            {[12, 14, 16, 18, 20, 24, 28, 32, 36].map(size => (
+                                <option key={size} value={size}>{size}px</option>
+                            ))}
+                        </select>
+                        <select
+                            className="px-2 py-1 rounded border border-gray-300 bg-gray-50 text-sm"
+                            value={align}
+                            onChange={e => {
+                                const value = e.target.value as 'left' | 'center' | 'right' | 'justify';
+                                setAlign(value);
+                                handleFormatChange('align', value);
+                            }}
+                        >
+                            <option value="left">Izquierda</option>
+                            <option value="center">Centro</option>
+                            <option value="right">Derecha</option>
+                            <option value="justify">Justificado</option>
+                        </select>
+                    </div>
                 </div>
             )}
 

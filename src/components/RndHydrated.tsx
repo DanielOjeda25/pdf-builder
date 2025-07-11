@@ -14,11 +14,8 @@ import {
 } from 'react-icons/fa';
 import type { IconType } from 'react-icons';
 
-import {
-    useEditorStore,
-    type BlockKind,
-    type ElementType,
-} from '@/store/useEditorStore';
+import { useEditorStore } from '@/store/useEditorStore';
+import type { BlockKind, ElementType } from '@/types/editor';
 
 import TextBlock from './TextBlock';
 import ImageBlock from './ImageBlock';
@@ -51,9 +48,9 @@ export default function RndHydrated({ el, grid }: Props) {
     const Inner = () => {
         switch (el.type) {
             case 'header':
-                return <TextBlock content={el.content} asHeader />;
+                return <TextBlock content={el.content} asHeader bold={el.bold} italic={el.italic} fontSize={el.fontSize} align={el.align} />;
             case 'text':
-                return <TextBlock content={el.content} />;
+                return <TextBlock content={el.content} bold={el.bold} italic={el.italic} fontSize={el.fontSize} align={el.align} />;
             case 'image':
                 if (!el.src) {
                     return (

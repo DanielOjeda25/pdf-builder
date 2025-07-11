@@ -19,6 +19,15 @@ const ICONS = {
     chart: FaChartBar,
 } as const;
 
+// Nombres en español para los tooltips
+const NOMBRES = {
+    header: 'Encabezado',
+    text: 'Párrafo',
+    image: 'Imagen',
+    table: 'Tabla',
+    chart: 'Gráfico',
+} as const;
+
 type Kind = keyof typeof ICONS;
 type Props = { type: Kind };
 
@@ -36,7 +45,7 @@ export default function PaletteItem({ type }: Props) {
             {...attributes}
             {...listeners}
             type="button"
-            title={type.toUpperCase()}
+            title={NOMBRES[type]}
             whileHover={{
                 scale: 1,
                 backgroundColor: '#fff',

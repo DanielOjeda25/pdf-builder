@@ -31,14 +31,24 @@ export default function Canvas() {
                 const left = (act.translated?.left ?? act.left) - bodyLeft;
                 const top = (act.translated?.top ?? act.top) - bodyTop;
 
+                // Dimensiones del canvas en píxeles (A4: 210mm x 297mm)
+                const CANVAS_W = 210 * 3.7795275591; // mm a px (aprox 794)
+                const CANVAS_H = 297 * 3.7795275591; // mm a px (aprox 1122)
+                const blockW = GRID_X * 4;
+                const blockH = GRID_Y * 2;
+                let x = Math.round(left / GRID_X) * GRID_X;
+                let y = Math.round(top / GRID_Y) * GRID_Y;
+                // Limitar para que no se salga del canvas
+                x = Math.max(0, Math.min(x, CANVAS_W - blockW));
+                y = Math.max(0, Math.min(y, CANVAS_H - blockH));
                 addElem({
                     id: uuid(),
                     type: active.data.current.type,
-                    content: active.data.current.type,
-                    x: Math.round(left / GRID_X) * GRID_X,
-                    y: Math.round(top / GRID_Y) * GRID_Y,
-                    w: GRID_X * 4,
-                    h: GRID_Y * 2,
+                    content: getDefaultContent(active.data.current.type),
+                    x,
+                    y,
+                    w: blockW,
+                    h: blockH,
                 });
             }
         },
@@ -67,4 +77,22 @@ export default function Canvas() {
             </motion.div>
         </LayoutGroup>
     );
+}
+
+// Traducción de los nombres de los bloques
+function getDefaultContent(type: string) {
+    switch (type) {
+        case 'header':
+            return 'Encabezado';
+        case 'text':
+            return 'Párrafo';
+        case 'image':
+            return 'Imagen';
+        case 'table':
+            return 'Tabla';
+        case 'chart':
+            return 'Gráfico';
+        default:
+            return '';
+    }
 }
