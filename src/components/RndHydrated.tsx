@@ -55,6 +55,13 @@ export default function RndHydrated({ el, grid }: Props) {
             case 'text':
                 return <TextBlock content={el.content} />;
             case 'image':
+                if (!el.src) {
+                    return (
+                        <span className="text-xs text-pdf-500 bg-white/80 px-2 py-1 rounded select-none">
+                            Arrastra y suelta una imagen aquí
+                        </span>
+                    );
+                }
                 return <ImageBlock id={el.id} src={el.src} />;
             default: {
                 const Icon = Icons[el.type];
@@ -65,8 +72,7 @@ export default function RndHydrated({ el, grid }: Props) {
 
     /* ---------- clases ---------- */
     const base =
-        `bg-pdf-500 text-white rounded-md shadow-sm hover:shadow-lg
-     transition cursor-move select-none ${selectedId === el.id ? 'ring-4 ring-pdf-300' : ''
+        `bg-transparent text-pdf-500 rounded-md shadow-md hover:shadow-lg border border-pdf-300 transition cursor-move select-none ${selectedId === el.id ? 'ring-4 ring-pdf-300' : ''
         }`;
 
     const contentCls =

@@ -25,7 +25,7 @@ interface EditorState {
     selectElement: (id: string | null) => void;
 }
 
-export const useEditorStore = create<EditorState>((set, get) => ({
+export const useEditorStore = create<EditorState>((set) => ({
     elements: [],
     selectedElementId: null,
 

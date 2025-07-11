@@ -10,7 +10,7 @@ export default function TextBlock({
         <div
             className={
                 'w-full h-full flex items-center justify-center overflow-hidden font-sans ' +
-                (asHeader ? 'text-lg font-bold' : 'text-sm')
+                (asHeader ? 'text-lg font-semibold' : 'text-sm')
             }
         >
             {content || (asHeader ? 'Encabezado' : 'Texto')}

@@ -27,7 +27,7 @@ export default function Canvas() {
                 const bodyLeft = over.rect.left + MARGIN_PX;
                 const bodyTop = over.rect.top + MARGIN_PX;
 
-                const act = active.rect.current as any;
+                const act = active.rect.current as unknown as { translated?: { left: number; top: number }; left: number; top: number };
                 const left = (act.translated?.left ?? act.left) - bodyLeft;
                 const top = (act.translated?.top ?? act.top) - bodyTop;
 
@@ -35,8 +35,6 @@ export default function Canvas() {
                     id: uuid(),
                     type: active.data.current.type,
                     content: active.data.current.type,
-                    style: {},
-                    data: null,
                     x: Math.round(left / GRID_X) * GRID_X,
                     y: Math.round(top / GRID_Y) * GRID_Y,
                     w: GRID_X * 4,

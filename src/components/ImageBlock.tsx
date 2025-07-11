@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useDropzone, FileRejection } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone';
 import { useEditorStore } from '@/store/useEditorStore';
+import Image from 'next/image';
 
 const MAX_SIZE = 1_048_576; // 1 MB
 
@@ -16,7 +17,7 @@ export default function ImageBlock({ id, src }: Props) {
 
     /* ——— callback de carga ——— */
     const onDrop = useCallback(
-        (accepted: File[], rejected: FileRejection[]) => {
+        (accepted: File[]) => {
             if (accepted[0]) {
                 const url = URL.createObjectURL(accepted[0]);
                 update(id, { src: url });
@@ -61,12 +62,23 @@ export default function ImageBlock({ id, src }: Props) {
             />
 
             {src ? (
-                <img
-                    src={src}
-                    alt="preview"
-                    className="max-w-full max-h-full object-contain pointer-events-none"
-                    draggable={false}
-                />
+                typeof src === 'string' && (src.startsWith('http://') || src.startsWith('https://')) ? (
+                    <Image
+                        src={src}
+                        alt="preview"
+                        width={400}
+                        height={300}
+                        className="max-w-full max-h-full object-contain pointer-events-none"
+                        draggable={false}
+                    />
+                ) : (
+                    <img
+                        src={src}
+                        alt="preview"
+                        className="max-w-full max-h-full object-contain pointer-events-none"
+                        draggable={false}
+                    />
+                )
             ) : (
                 <span className="text-xs text-white whitespace-pre-line select-none">
                     {tooLarge

@@ -1,6 +1,5 @@
 'use client';
 import { useEditorStore } from '@/store/useEditorStore';
-import type { ElementType } from '@/types/editor';
 
 /* ---------- helpers ---------- */
 function FileInput({
