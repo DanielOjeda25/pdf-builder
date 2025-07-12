@@ -27,7 +27,10 @@ export default function TextBlock({
                 textAlign: align,
             }}
         >
-            {content || (asHeader ? 'Encabezado' : 'Texto')}
+            <div
+                className="w-full h-full prose prose-p:my-1 prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-strong:font-bold prose-em:italic prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:text-gray-500 prose-ul:list-disc prose-ol:list-decimal prose-li:ml-6 prose-li:my-1 prose-a:text-blue-600 prose-a:underline prose-img:max-w-full prose-img:h-auto"
+                dangerouslySetInnerHTML={{ __html: content || (asHeader ? 'Encabezado' : 'Párrafo') }}
+            />
         </div>
     );
 }
