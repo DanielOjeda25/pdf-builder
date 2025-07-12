@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { text, action, range, color, fontSize, fontFamily } = await req.json();
+  const { text, action, range, color, fontSize, fontFamily, align } = await req.json();
 
   if (typeof text !== 'string' || !action || !range || !Array.isArray(range) || range.length !== 2) {
     return NextResponse.json({ error: 'Parámetros inválidos' }, { status: 400 });
@@ -14,22 +14,111 @@ export async function POST(req: NextRequest) {
     end = text.length;
   }
 
-  if (action === 'bold') {
-    html = text.slice(0, start) + '<b>' + text.slice(start, end) + '</b>' + text.slice(end);
-  } else if (action === 'italic') {
-    html = text.slice(0, start) + '<i>' + text.slice(start, end) + '</i>' + text.slice(end);
-  } else if (action === 'underline') {
-    html = text.slice(0, start) + '<u>' + text.slice(start, end) + '</u>' + text.slice(end);
-  } else if (action === 'color' && color) {
-    html = text.slice(0, start) + `<span style="color:${color}">` + text.slice(start, end) + '</span>' + text.slice(end);
-  } else if (action === 'fontSize' && fontSize) {
-    let style = `font-size:${fontSize}px`;
-    if (fontFamily) style += `;font-family:${fontFamily}`;
-    html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
-  } else if (action === 'fontFamily' && fontFamily) {
-    let style = `font-family:${fontFamily}`;
-    if (fontSize) style += `;font-size:${fontSize}px`;
-    html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
+  switch (action) {
+    case 'bold':
+      // Para bold, preservar color y alineación existentes
+      if (align && align !== 'left') {
+        // Si hay alineación, usar div para preservarla
+        let style = `text-align:${align};font-weight:bold;`;
+        if (color) style += `color:${color};`;
+        if (fontSize) style += `font-size:${fontSize}px;`;
+        if (fontFamily) style += `font-family:${fontFamily};`;
+        html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
+      } else {
+        // Si no hay alineación especial, usar span
+        let style = 'font-weight:bold;';
+        if (color) style += `color:${color};`;
+        if (fontSize) style += `font-size:${fontSize}px;`;
+        if (fontFamily) style += `font-family:${fontFamily};`;
+        html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
+      }
+      break;
+    case 'italic':
+      // Para italic, preservar color y alineación existentes
+      if (align && align !== 'left') {
+        // Si hay alineación, usar div para preservarla
+        let style = `text-align:${align};font-style:italic;`;
+        if (color) style += `color:${color};`;
+        if (fontSize) style += `font-size:${fontSize}px;`;
+        if (fontFamily) style += `font-family:${fontFamily};`;
+        html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
+      } else {
+        // Si no hay alineación especial, usar span
+        let style = 'font-style:italic;';
+        if (color) style += `color:${color};`;
+        if (fontSize) style += `font-size:${fontSize}px;`;
+        if (fontFamily) style += `font-family:${fontFamily};`;
+        html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
+      }
+      break;
+    case 'underline':
+      // Para underline, preservar color y alineación existentes
+      if (align && align !== 'left') {
+        // Si hay alineación, usar div para preservarla
+        let style = `text-align:${align};text-decoration:underline;`;
+        if (color) style += `color:${color};`;
+        if (fontSize) style += `font-size:${fontSize}px;`;
+        if (fontFamily) style += `font-family:${fontFamily};`;
+        html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
+      } else {
+        // Si no hay alineación especial, usar span
+        let style = 'text-decoration:underline;';
+        if (color) style += `color:${color};`;
+        if (fontSize) style += `font-size:${fontSize}px;`;
+        if (fontFamily) style += `font-family:${fontFamily};`;
+        html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
+      }
+      break;
+    case 'color':
+      // Para color, preservar la alineación existente si está presente
+      if (color) {
+        if (align && align !== 'left') {
+          // Si hay alineación, usar div para preservarla
+          html = text.slice(0, start) + `<div style="text-align:${align};color:${color}">` + text.slice(start, end) + '</div>' + text.slice(end);
+        } else {
+          // Si no hay alineación especial, usar span
+          html = text.slice(0, start) + `<span style="color:${color}">` + text.slice(start, end) + '</span>' + text.slice(end);
+        }
+      }
+      break;
+    case 'fontSize':
+      // Para tamaño de fuente, preservar la alineación existente si está presente
+      if (fontSize) {
+        if (align && align !== 'left') {
+          // Si hay alineación, usar div para preservarla
+          html = text.slice(0, start) + `<div style="text-align:${align};font-size:${fontSize}px">` + text.slice(start, end) + '</div>' + text.slice(end);
+        } else {
+          // Si no hay alineación especial, usar span
+          html = text.slice(0, start) + `<span style="font-size:${fontSize}px">` + text.slice(start, end) + '</span>' + text.slice(end);
+        }
+      }
+      break;
+    case 'fontFamily':
+      // Para familia de fuente, preservar la alineación existente si está presente
+      if (fontFamily) {
+        if (align && align !== 'left') {
+          // Si hay alineación, usar div para preservarla
+          html = text.slice(0, start) + `<div style="text-align:${align};font-family:${fontFamily}">` + text.slice(start, end) + '</div>' + text.slice(end);
+        } else {
+          // Si no hay alineación especial, usar span
+          html = text.slice(0, start) + `<span style="font-family:${fontFamily}">` + text.slice(start, end) + '</span>' + text.slice(end);
+        }
+      }
+      break;
+    case 'align':
+      // Para alineación, usar div que puede contener todo el contenido
+      if (align) {
+        // Construir estilos completos para el div de alineación
+        let style = `text-align:${align};`;
+        if (fontSize) style += `font-size:${fontSize}px;`;
+        if (fontFamily) style += `font-family:${fontFamily};`;
+        if (color) style += `color:${color};`;
+        
+        html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
+      }
+      break;
+    default:
+      break;
   }
 
   return NextResponse.json({ html });
