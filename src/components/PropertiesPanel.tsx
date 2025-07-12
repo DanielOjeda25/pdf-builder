@@ -218,6 +218,9 @@ export default function PropertiesPanel() {
     if (!element)
         return <p className="text-xs text-gray-400">Seleccione un bloque.</p>;
 
+    // Obtener estilos actuales para mostrar el estado de los botones
+    const currentStyles = getCurrentStylesFromHTML();
+
     return (
         <div className="bg-white shadow rounded-lg p-4 space-y-4">
             {/* header & text */}
@@ -229,14 +232,35 @@ export default function PropertiesPanel() {
                     {/* Barra de herramientas WYSIWYG */}
                     <div className="flex flex-wrap gap-3 mb-2 items-center p-2 bg-gray-50 rounded-lg border border-gray-200">
                         {/* Formato */}
-                        <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('bold'); }} className="text-gray-500 hover:text-pdf-500" title="Negrita"><FaBold /></button>
-                        <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('italic'); }} className="text-gray-500 hover:text-pdf-500" title="Cursiva"><FaItalic /></button>
-                        <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('underline'); }} className="text-gray-500 hover:text-pdf-500" title="Subrayado"><FaUnderline /></button>
+                        <button
+                            type="button"
+                            onMouseDown={e => { e.preventDefault(); applyFormat('bold'); }}
+                            className={`p-1 rounded transition-colors ${currentStyles.bold ? 'bg-pdf-500 text-white' : 'text-gray-500 hover:text-pdf-500 hover:bg-gray-200'}`}
+                            title="Negrita"
+                        >
+                            <FaBold />
+                        </button>
+                        <button
+                            type="button"
+                            onMouseDown={e => { e.preventDefault(); applyFormat('italic'); }}
+                            className={`p-1 rounded transition-colors ${currentStyles.italic ? 'bg-pdf-500 text-white' : 'text-gray-500 hover:text-pdf-500 hover:bg-gray-200'}`}
+                            title="Cursiva"
+                        >
+                            <FaItalic />
+                        </button>
+                        <button
+                            type="button"
+                            onMouseDown={e => { e.preventDefault(); applyFormat('underline'); }}
+                            className={`p-1 rounded transition-colors ${currentStyles.underline ? 'bg-pdf-500 text-white' : 'text-gray-500 hover:text-pdf-500 hover:bg-gray-200'}`}
+                            title="Subrayado"
+                        >
+                            <FaUnderline />
+                        </button>
                         {/* Color */}
                         <input
                             type="color"
                             onChange={e => applyFormat('color', e.target.value)}
-                            className="w-7 h-7 p-0 border-0 bg-transparent cursor-pointer"
+                            className="w-7 h-7 p-0 border-0 bg-transparent cursor-pointer rounded"
                             title="Color de texto"
                             aria-label="Color de texto"
                             style={{ minWidth: 28, minHeight: 28 }}
@@ -270,10 +294,38 @@ export default function PropertiesPanel() {
                         </select>
                         {/* Alineación */}
                         <div className="flex gap-1 ml-2">
-                            <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('align', 'left'); }} title="Alinear a la izquierda"><FaAlignLeft /></button>
-                            <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('align', 'center'); }} title="Centrar"><FaAlignCenter /></button>
-                            <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('align', 'right'); }} title="Alinear a la derecha"><FaAlignRight /></button>
-                            <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('align', 'justify'); }} title="Justificar"><FaAlignJustify /></button>
+                            <button
+                                type="button"
+                                onMouseDown={e => { e.preventDefault(); applyFormat('align', 'left'); }}
+                                className={`p-1 rounded transition-colors ${currentStyles.align === 'left' ? 'bg-pdf-500 text-white' : 'text-gray-500 hover:text-pdf-500 hover:bg-gray-200'}`}
+                                title="Alinear a la izquierda"
+                            >
+                                <FaAlignLeft />
+                            </button>
+                            <button
+                                type="button"
+                                onMouseDown={e => { e.preventDefault(); applyFormat('align', 'center'); }}
+                                className={`p-1 rounded transition-colors ${currentStyles.align === 'center' ? 'bg-pdf-500 text-white' : 'text-gray-500 hover:text-pdf-500 hover:bg-gray-200'}`}
+                                title="Centrar"
+                            >
+                                <FaAlignCenter />
+                            </button>
+                            <button
+                                type="button"
+                                onMouseDown={e => { e.preventDefault(); applyFormat('align', 'right'); }}
+                                className={`p-1 rounded transition-colors ${currentStyles.align === 'right' ? 'bg-pdf-500 text-white' : 'text-gray-500 hover:text-pdf-500 hover:bg-gray-200'}`}
+                                title="Alinear a la derecha"
+                            >
+                                <FaAlignRight />
+                            </button>
+                            <button
+                                type="button"
+                                onMouseDown={e => { e.preventDefault(); applyFormat('align', 'justify'); }}
+                                className={`p-1 rounded transition-colors ${currentStyles.align === 'justify' ? 'bg-pdf-500 text-white' : 'text-gray-500 hover:text-pdf-500 hover:bg-gray-200'}`}
+                                title="Justificar"
+                            >
+                                <FaAlignJustify />
+                            </button>
                         </div>
                     </div>
                     {/* Área editable */}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { text, action, range, color, fontSize, fontFamily, align } = await req.json();
+  const { text, action, range, color, fontSize, fontFamily, align, bold, italic, underline } = await req.json();
 
   if (typeof text !== 'string' || !action || !range || !Array.isArray(range) || range.length !== 2) {
     return NextResponse.json({ error: 'Parámetros inválidos' }, { status: 400 });
@@ -23,6 +23,8 @@ export async function POST(req: NextRequest) {
         if (color) style += `color:${color};`;
         if (fontSize) style += `font-size:${fontSize}px;`;
         if (fontFamily) style += `font-family:${fontFamily};`;
+        if (italic) style += 'font-style:italic;';
+        if (underline) style += 'text-decoration:underline;';
         html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
       } else {
         // Si no hay alineación especial, usar span
@@ -30,6 +32,8 @@ export async function POST(req: NextRequest) {
         if (color) style += `color:${color};`;
         if (fontSize) style += `font-size:${fontSize}px;`;
         if (fontFamily) style += `font-family:${fontFamily};`;
+        if (italic) style += 'font-style:italic;';
+        if (underline) style += 'text-decoration:underline;';
         html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
       }
       break;
@@ -41,6 +45,8 @@ export async function POST(req: NextRequest) {
         if (color) style += `color:${color};`;
         if (fontSize) style += `font-size:${fontSize}px;`;
         if (fontFamily) style += `font-family:${fontFamily};`;
+        if (bold) style += 'font-weight:bold;';
+        if (underline) style += 'text-decoration:underline;';
         html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
       } else {
         // Si no hay alineación especial, usar span
@@ -48,6 +54,8 @@ export async function POST(req: NextRequest) {
         if (color) style += `color:${color};`;
         if (fontSize) style += `font-size:${fontSize}px;`;
         if (fontFamily) style += `font-family:${fontFamily};`;
+        if (bold) style += 'font-weight:bold;';
+        if (underline) style += 'text-decoration:underline;';
         html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
       }
       break;
@@ -59,6 +67,8 @@ export async function POST(req: NextRequest) {
         if (color) style += `color:${color};`;
         if (fontSize) style += `font-size:${fontSize}px;`;
         if (fontFamily) style += `font-family:${fontFamily};`;
+        if (bold) style += 'font-weight:bold;';
+        if (italic) style += 'font-style:italic;';
         html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
       } else {
         // Si no hay alineación especial, usar span
@@ -66,6 +76,8 @@ export async function POST(req: NextRequest) {
         if (color) style += `color:${color};`;
         if (fontSize) style += `font-size:${fontSize}px;`;
         if (fontFamily) style += `font-family:${fontFamily};`;
+        if (bold) style += 'font-weight:bold;';
+        if (italic) style += 'font-style:italic;';
         html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
       }
       break;
@@ -74,10 +86,22 @@ export async function POST(req: NextRequest) {
       if (color) {
         if (align && align !== 'left') {
           // Si hay alineación, usar div para preservarla
-          html = text.slice(0, start) + `<div style="text-align:${align};color:${color}">` + text.slice(start, end) + '</div>' + text.slice(end);
+          let style = `text-align:${align};color:${color};`;
+          if (fontSize) style += `font-size:${fontSize}px;`;
+          if (fontFamily) style += `font-family:${fontFamily};`;
+          if (bold) style += 'font-weight:bold;';
+          if (italic) style += 'font-style:italic;';
+          if (underline) style += 'text-decoration:underline;';
+          html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
         } else {
           // Si no hay alineación especial, usar span
-          html = text.slice(0, start) + `<span style="color:${color}">` + text.slice(start, end) + '</span>' + text.slice(end);
+          let style = `color:${color};`;
+          if (fontSize) style += `font-size:${fontSize}px;`;
+          if (fontFamily) style += `font-family:${fontFamily};`;
+          if (bold) style += 'font-weight:bold;';
+          if (italic) style += 'font-style:italic;';
+          if (underline) style += 'text-decoration:underline;';
+          html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
         }
       }
       break;
@@ -86,10 +110,22 @@ export async function POST(req: NextRequest) {
       if (fontSize) {
         if (align && align !== 'left') {
           // Si hay alineación, usar div para preservarla
-          html = text.slice(0, start) + `<div style="text-align:${align};font-size:${fontSize}px">` + text.slice(start, end) + '</div>' + text.slice(end);
+          let style = `text-align:${align};font-size:${fontSize}px;`;
+          if (color) style += `color:${color};`;
+          if (fontFamily) style += `font-family:${fontFamily};`;
+          if (bold) style += 'font-weight:bold;';
+          if (italic) style += 'font-style:italic;';
+          if (underline) style += 'text-decoration:underline;';
+          html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
         } else {
           // Si no hay alineación especial, usar span
-          html = text.slice(0, start) + `<span style="font-size:${fontSize}px">` + text.slice(start, end) + '</span>' + text.slice(end);
+          let style = `font-size:${fontSize}px;`;
+          if (color) style += `color:${color};`;
+          if (fontFamily) style += `font-family:${fontFamily};`;
+          if (bold) style += 'font-weight:bold;';
+          if (italic) style += 'font-style:italic;';
+          if (underline) style += 'text-decoration:underline;';
+          html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
         }
       }
       break;
@@ -98,10 +134,22 @@ export async function POST(req: NextRequest) {
       if (fontFamily) {
         if (align && align !== 'left') {
           // Si hay alineación, usar div para preservarla
-          html = text.slice(0, start) + `<div style="text-align:${align};font-family:${fontFamily}">` + text.slice(start, end) + '</div>' + text.slice(end);
+          let style = `text-align:${align};font-family:${fontFamily};`;
+          if (color) style += `color:${color};`;
+          if (fontSize) style += `font-size:${fontSize}px;`;
+          if (bold) style += 'font-weight:bold;';
+          if (italic) style += 'font-style:italic;';
+          if (underline) style += 'text-decoration:underline;';
+          html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
         } else {
           // Si no hay alineación especial, usar span
-          html = text.slice(0, start) + `<span style="font-family:${fontFamily}">` + text.slice(start, end) + '</span>' + text.slice(end);
+          let style = `font-family:${fontFamily};`;
+          if (color) style += `color:${color};`;
+          if (fontSize) style += `font-size:${fontSize}px;`;
+          if (bold) style += 'font-weight:bold;';
+          if (italic) style += 'font-style:italic;';
+          if (underline) style += 'text-decoration:underline;';
+          html = text.slice(0, start) + `<span style="${style}">` + text.slice(start, end) + '</span>' + text.slice(end);
         }
       }
       break;
@@ -113,6 +161,9 @@ export async function POST(req: NextRequest) {
         if (fontSize) style += `font-size:${fontSize}px;`;
         if (fontFamily) style += `font-family:${fontFamily};`;
         if (color) style += `color:${color};`;
+        if (bold) style += 'font-weight:bold;';
+        if (italic) style += 'font-style:italic;';
+        if (underline) style += 'text-decoration:underline;';
         
         html = text.slice(0, start) + `<div style="${style}">` + text.slice(start, end) + '</div>' + text.slice(end);
       }
