@@ -32,6 +32,45 @@ export default function PropertiesPanel() {
         }
     };
 
+    // Nueva función para aplicar formato usando el backend
+    async function applyFormat(action: string, extra?: any) {
+        if (!editorRef.current || !element) return;
+        const selection = window.getSelection();
+        const text = editorRef.current.innerText;
+        let range: [number, number] = [0, 0];
+        if (selection && selection.rangeCount > 0 && selection.toString().length > 0) {
+            const selRange = selection.getRangeAt(0);
+            const preSelectionRange = selRange.cloneRange();
+            preSelectionRange.selectNodeContents(editorRef.current);
+            preSelectionRange.setEnd(selRange.startContainer, selRange.startOffset);
+            const start = preSelectionRange.toString().length;
+            const end = start + selRange.toString().length;
+            range = [start, end];
+        }
+        // Si no hay selección, aplica a todo el texto (rango [0,0])
+        const body: any = { text, action, range };
+        if (action === 'color' && extra) body.color = extra;
+        if (action === 'fontSize' && extra) body.fontSize = extra;
+        if (action === 'fontFamily' && extra) body.fontFamily = extra;
+        // Si hay fontSize seleccionado, incluirlo al cambiar fontFamily y viceversa
+        if ((action === 'fontFamily' || action === 'fontSize')) {
+            const sizeInput = document.querySelector('input[type="number"][title="Tamaño de fuente"]') as HTMLInputElement;
+            if (sizeInput && sizeInput.value) body.fontSize = sizeInput.value;
+            const fontSelect = document.querySelector('select[title="Tipo de letra"]') as HTMLSelectElement;
+            if (fontSelect && fontSelect.value) body.fontFamily = fontSelect.value;
+        }
+        const res = await fetch('/api/format-text', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.html) {
+            editorRef.current.innerHTML = data.html;
+            update(element.id, { content: data.html });
+        }
+    }
+
     // Comandos de formato mejorados
     const exec = (command: string, value?: string) => {
         const selection = window.getSelection();
@@ -79,13 +118,13 @@ export default function PropertiesPanel() {
                             ))}
                         </select>
                         {/* Formato */}
-                        <button type="button" onMouseDown={e => { e.preventDefault(); exec('bold'); }} className="font-bold text-gray-500 hover:text-pdf-500" title="Negrita">B</button>
-                        <button type="button" onMouseDown={e => { e.preventDefault(); exec('italic'); }} className="italic text-gray-500 hover:text-pdf-500" title="Cursiva">I</button>
-                        <button type="button" onMouseDown={e => { e.preventDefault(); exec('underline'); }} className="underline text-gray-500 hover:text-pdf-500" title="Subrayado">U</button>
+                        <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('bold'); }} className="font-bold text-gray-500 hover:text-pdf-500" title="Negrita">B</button>
+                        <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('italic'); }} className="italic text-gray-500 hover:text-pdf-500" title="Cursiva">I</button>
+                        <button type="button" onMouseDown={e => { e.preventDefault(); applyFormat('underline'); }} className="underline text-gray-500 hover:text-pdf-500" title="Subrayado">U</button>
                         {/* Color */}
                         <input
                             type="color"
-                            onChange={e => exec('foreColor', e.target.value)}
+                            onChange={e => applyFormat('color', e.target.value)}
                             className="w-7 h-7 p-0 border-0 bg-transparent cursor-pointer"
                             title="Color de texto"
                             aria-label="Color de texto"
@@ -98,7 +137,7 @@ export default function PropertiesPanel() {
                                 min={8}
                                 max={96}
                                 defaultValue={16}
-                                onChange={e => exec('fontSize', e.target.value)}
+                                onChange={e => applyFormat('fontSize', e.target.value)}
                                 className="w-14 border border-gray-300 rounded px-2 py-1 text-xs focus:ring-2 focus:ring-pdf-300 focus:border-pdf-500 transition"
                                 style={{ height: 28 }}
                                 title="Tamaño de fuente"
@@ -110,7 +149,7 @@ export default function PropertiesPanel() {
                         <select
                             className="border rounded px-2 py-1 text-xs ml-2 bg-white focus:ring-2 focus:ring-pdf-300"
                             defaultValue={FONT_FAMILIES[0].value}
-                            onChange={e => exec('fontName', e.target.value)}
+                            onChange={e => applyFormat('fontFamily', e.target.value)}
                             style={{ minWidth: 90, height: 28 }}
                             title="Tipo de letra"
                         >
